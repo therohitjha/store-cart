@@ -118,9 +118,9 @@ export default function Home() {
     setTotalPrice((prevTotalPrice) => prevTotalPrice + (oldPrice-itemDiscount));
   };
 
-  const decreaseQty = (oldPrice,newPrice, itemDiscount) => {
+  const decreaseQty = (oldPrice,newPrice, itemDiscount,id) => {
     if (state <= 0) {
-      setTotalPrice(0)
+    removeFromCart(id)
       setState(0);
     } else {
       setState((prevState) => prevState - 1);

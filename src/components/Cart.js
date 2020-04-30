@@ -47,7 +47,8 @@ export default function Cart() {
                                 decreaseQty(
                                   _.data.price.display,
                                   _.data.price.actual,
-                                  _.data.discount
+                                  _.data.discount,
+                                  _.data.id
                                 )
                               }
                             >
