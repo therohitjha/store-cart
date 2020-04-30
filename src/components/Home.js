@@ -1,5 +1,5 @@
 import React, { useState, createContext, useEffect } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 import ShoppingCart from "./ShoppingCart";
 import ProductList from "./ProductList";
 import Cart from "./Cart";
@@ -131,7 +131,7 @@ export default function Home() {
   };
 
   return (
-    <Router>
+    <HashRouter basename='/'>
       <Switch>
         <ShoppingContext.Provider value={[addToCart, productList]}>
           <CartContext.Provider
@@ -163,6 +163,6 @@ export default function Home() {
           </CartContext.Provider>
         </ShoppingContext.Provider>
       </Switch>
-    </Router>
+    </HashRouter>
   );
 }
