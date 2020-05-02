@@ -24,6 +24,7 @@ img {
   .hide4Mobile {
     display: none;
   }
+
   .logo {
     .fa-star {
       color: yellow;
@@ -181,8 +182,14 @@ img {
     margin-left: 5px;
   }
 
+  .applyBtn{
+    display:none;
+  }
+
   .filterBody {
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
   }
 
   .filterCancelApply {
@@ -242,6 +249,7 @@ img {
       align-items: center;
     }
     .applyBtn {
+      display: block;
       border-radius: 20px;
       background: rgb(65, 65, 190);
       color: white;

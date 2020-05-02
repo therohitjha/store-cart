@@ -21,7 +21,9 @@ function FilterModal({ show, handleClose }) {
               min={min}
               max={max}
               onChange={(e) => handleFilter(e)}
+              style={{width:'100%'}}
             />
+            {priceFilter}
           </div>
 
           <div className="filterCancelApply">
