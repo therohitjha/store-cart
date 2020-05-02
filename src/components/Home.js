@@ -5,32 +5,28 @@ import ProductList from "./ProductList";
 import Cart from "./Cart";
 import { API } from "./data/cart";
 
-export const ShoppingContext = createContext();
 export const CartContext = createContext();
-export const SortingContext = createContext();
-export const FilterContext = createContext();
-export const SearchContext = createContext();
 
 export default function Home() {
   const [productList, setProductList] = useState();
   const [cartList, setCartList] = useState([]);
-  const [state, setState] = useState(1);
   const [price, setPrice] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [sorting, setSorting] = useState("");
   const [search, setSearch] = useState("");
+  const [totalItem, setTotalItem] = useState(0);
 
   useEffect(() => {
     const filterData = new Promise((res, rej) => {
-      API ? res(setProductList(API)) : rej("please try again");
+      API ? res(setProductList(API)) : rej("Something went Wrong...");
     });
 
     filterData
       .then(() => {
         search &&
-          setProductList(
-            productList.filter((data) =>
+          setProductList((prevData) =>
+            prevData.filter((data) =>
               data.name.toLowerCase().includes(search.toLowerCase())
             )
           );
@@ -38,22 +34,39 @@ export default function Home() {
       .catch(console.log());
   }, [search]);
 
+  useEffect(() => {
+    let total = 0;
+    let totalItem = 0;
+    let discount = 0;
+    let mrp = 0;
+    cartList.forEach((item) => {
+      total += item.total;
+      totalItem += item.count;
+      discount += item.mrp - item.total;
+      mrp += item.mrp;
+    });
+    setTotalItem(totalItem);
+    setTotalPrice(total);
+    setDiscount(discount);
+    setPrice(mrp);
+  }, [cartList, totalItem, totalPrice, discount]);
+
   const handleOnChange = (e) => {
     const { value } = e.target;
     setSearch(value);
   };
 
-  const applyFilter = () => {
+  const handleProductSorting = () => {
     const filterData = [...productList];
     if (sorting === "reset") {
       setProductList(filterData.sort((a, b) => a.id - b.id));
     } else if (sorting === "high") {
       setProductList(
-        filterData.sort((a, b) => b.price.display - a.price.display)
+        filterData.sort((a, b) => b.price.actual - a.price.actual)
       );
     } else if (sorting === "low") {
       setProductList(
-        filterData.sort((a, b) => a.price.display - b.price.display)
+        filterData.sort((a, b) => a.price.actual - b.price.actual)
       );
     } else if (sorting === "discount") {
       setProductList(filterData.sort((a, b) => b.discount - a.discount));
@@ -61,107 +74,86 @@ export default function Home() {
   };
 
   const addToCart = (data) => {
-    if (cartList.length <= 0) {
-      setPrice(0);
-      setDiscount(0);
-      setState(1);
-      setTotalPrice(0);
-    }
-
-    const itemExist = cartList.some((_) => {
-      return _.id === data.id;
-    });
-    if (itemExist) {
-      setCartList([...cartList]);
+    let tempCart = [...cartList];
+    let tempProduct = [...productList];
+    let tempItem = tempCart.find((item) => item.id === data.id);
+    if (!tempItem) {
+      tempItem = tempProduct.find((item) => item.id === data.id);
+      let total = tempItem.price.actual;
+      let mrp = tempItem.price.display;
+      let cartItem = { ...tempItem, count: 1, total, mrp };
+      tempCart = [...tempCart, cartItem];
     } else {
-      setCartList([...cartList, { data }]);
-      setPrice((prevData) => prevData + data.price.display);
-      setDiscount(
-        (prevDiscount) =>
-          prevDiscount + (data.price.display - data.price.actual)
-      );
-      setTotalPrice((prevTotalPrice) => prevTotalPrice + data.price.actual);
+      tempItem.count++;
+      tempItem.total = tempItem.price.actual * tempItem.count;
+      tempItem.mrp = tempItem.price.display * tempItem.count;
     }
+    setCartList(tempCart);
+    setPrice(tempItem.mrp);
   };
 
   const removeFromCart = (id) => {
     if (cartList.length > 0) {
-      const data = cartList.filter((_) => _.data.id !== id);
-      const updatePrice = cartList.filter(
-        (_) => _.data.id === id && _.data.price.display
-      );
-      setCartList(data);
-      setPrice((prevPrice) => prevPrice - updatePrice[0].data.price.display);
-      setDiscount((prevDiscount) => {
-        return (
-          prevDiscount -
-          (updatePrice[0].data.price.display -
-            (updatePrice[0].data.price.display -
-              (updatePrice[0].data.price.display / 100) *
-                updatePrice[0].data.discount))
-        );
-      });
-      setTotalPrice(
-        (prevTotalPrice) =>
-          prevTotalPrice -
-          (updatePrice[0].data.price.display -
-            (updatePrice[0].data.price.display / 100) *
-              updatePrice[0].data.discount)
-      );
+      let tempCart = cartList.filter((_) => _.id !== id);
+      setCartList([...tempCart]);
     }
   };
 
-  const increaseQty = (oldPrice,newPrice, itemDiscount) => {
-    setState((prevState) => prevState + 1);
-    setPrice((prevPrice) => prevPrice + oldPrice);
-    setDiscount((prevDiscount) => prevDiscount+(oldPrice-newPrice));
-    setTotalPrice((prevTotalPrice) => prevTotalPrice + (oldPrice-itemDiscount));
+  const increaseQty = (productData) => {
+    if (productData) {
+      let tempCart = [...cartList];
+      let tempItem = tempCart.find((item) => item.id === productData.id);
+      tempItem.count++;
+      tempItem.total = tempItem.price.actual * tempItem.count;
+      tempItem.mrp = tempItem.price.display * tempItem.count;
+      setCartList(tempCart);
+    }
   };
 
-  const decreaseQty = (oldPrice,newPrice, itemDiscount,id) => {
-    if (state <= 0) {
-    removeFromCart(id)
-      setState(0);
-    } else {
-      setState((prevState) => prevState - 1);
-      setPrice((prevPrice) => prevPrice - oldPrice);
-      setDiscount((prevDiscount) => prevDiscount -(oldPrice-newPrice) );
-      setTotalPrice((prevTotalPrice) =>prevTotalPrice - (oldPrice-itemDiscount));
+  const decreaseQty = (productData) => {
+    if (productData) {
+      let tempCart = [...cartList];
+      let tempItem = tempCart.find((item) => item.id === productData.id);
+      tempItem.count--;
+      tempItem.total = tempItem.price.actual * tempItem.count;
+      tempItem.mrp = tempItem.price.display * tempItem.count;
+      setCartList(tempCart);
     }
   };
 
   return (
-    <HashRouter basename='/'>
+    <HashRouter basename="/">
       <Switch>
-        <ShoppingContext.Provider value={[addToCart, productList]}>
-          <CartContext.Provider
-            value={[
-              cartList,
-              removeFromCart,
-              state,
-              increaseQty,
-              decreaseQty,
-              price,
-              discount,
-              totalPrice,
-            ]}
-          >
-            <SortingContext.Provider value={[sorting, setSorting, applyFilter]}>
-              <SearchContext.Provider value={{ handleOnChange, search }}>
-                <Route
-                  exact
-                  path="/"
-                  render={() => <ShoppingCart body={<ProductList />} />}
-                />
-                <Route
-                  exact
-                  path="/cart"
-                  render={() => <ShoppingCart body={<Cart />} />}
-                />
-              </SearchContext.Provider>
-            </SortingContext.Provider>
-          </CartContext.Provider>
-        </ShoppingContext.Provider>
+        <CartContext.Provider
+          value={{
+            cartList,
+            removeFromCart,
+            increaseQty,
+            decreaseQty,
+            price,
+            discount,
+            totalPrice,
+            totalItem,
+            addToCart,
+            productList,
+            sorting,
+            setSorting,
+            handleProductSorting,
+            handleOnChange,
+            search,
+          }}
+        >
+          <Route
+            exact
+            path="/"
+            render={() => <ShoppingCart body={<ProductList />} />}
+          />
+          <Route
+            exact
+            path="/cart"
+            render={() => <ShoppingCart body={<Cart />} />}
+          />
+        </CartContext.Provider>
       </Switch>
     </HashRouter>
   );

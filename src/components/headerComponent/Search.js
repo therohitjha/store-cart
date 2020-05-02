@@ -1,9 +1,9 @@
 import React, { Fragment, useContext } from "react";
 import { HeaderContext } from "./Header";
-import {SearchContext} from '../Home'
+import { CartContext} from '../Home'
 export default function Search() {
   const [toggle,setToggle] = useContext(HeaderContext);
-const {handleOnChange,search}=useContext(SearchContext)
+const {handleOnChange,search}=useContext(CartContext)
 
   return (
     <Fragment>

@@ -1,12 +1,12 @@
 import React, { useContext } from "react";
-import { ShoppingContext } from "./Home";
+import { CartContext } from "./Home";
 import Filter from "./filterComponents/Filter";
 import { Range } from "rc-slider";
 import "rc-slider/assets/index.css";
 import Sorting from "./filterComponents/Sorting";
 
 function ProductList() {
-  const [addToCart, productList] = useContext(ShoppingContext);
+  const {addToCart, productList} = useContext(CartContext);
 
 
   return (

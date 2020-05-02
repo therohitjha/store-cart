@@ -1,16 +1,17 @@
 import React, { useContext } from "react";
 import { CartContext } from "./Home";
 export default function Cart() {
-  const [
+  const {
     cartList,
     removeFromCart,
-    state,
     increaseQty,
     decreaseQty,
     price,
     discount,
     totalPrice,
-  ] = useContext(CartContext);
+    totalItem,
+  } = useContext(CartContext);
+
   return (
     <div className="cartContainer">
       <div className="row">
@@ -18,63 +19,46 @@ export default function Cart() {
           {cartList.length > 0 &&
             cartList.map((_) => {
               return (
-                <div key={_.data.id}>
+                <div key={_.id}>
                   <div className="card">
                     <div className="card-body" style={{ display: "flex" }}>
                       <div className="cartImgContainer">
-                        <img
-                          src={_.data.img_url}
-                          class="card-img-top"
-                          alt="..."
-                        />
+                        <img src={_.img_url} className="card-img-top" alt="..." />
                       </div>
                       <div style={{ width: "100%" }}>
-                        <h6 className="card-title">{_.data.name}</h6>
+                        <h6 className="card-title">{_.name}</h6>
                         <div className="cartBody4Web">
                           <div className="priceContainer">
-                            <p className="card-text">₹{_.data.price.actual}</p>
+                            <p className="card-text">₹{_.price.actual}</p>
                             <p className="card-text oldPrice">
-                              ₹{_.data.price.display}
+                              ₹{_.price.display}
                             </p>
                             <p className="card-text discountColor">
-                              {_.data.discount}% OFF
+                              {_.discount}% OFF
                             </p>
                           </div>
                           <div>
                             <button
                               className="qty"
-                              onClick={() =>
-                                decreaseQty(
-                                  _.data.price.display,
-                                  _.data.price.actual,
-                                  _.data.discount,
-                                  _.data.id
-                                )
-                              }
+                              onClick={() => decreaseQty(_)}
                             >
                               -
                             </button>
                             <input
                               type="text"
-                              value={state}
+                              value={_.count}
                               className="qtyInput"
                             />
                             <button
                               className="qty"
-                              onClick={() =>
-                                increaseQty(
-                                  _.data.price.display,
-                                  _.data.price.actual,
-                                  _.data.discount
-                                )
-                              }
+                              onClick={() => increaseQty(_)}
                             >
                               +
                             </button>
                           </div>
                           <button
                             className="cartRemoveBtn"
-                            onClick={() => removeFromCart(_.data.id)}
+                            onClick={() => removeFromCart(_.id)}
                           >
                             Remove
                           </button>
@@ -88,15 +72,13 @@ export default function Cart() {
         </div>
         <div className="col-lg-4 col-xs-12">
           {cartList.length > 0 && (
-            <div class="card mb-3">
-              <div class="card-header">Product Details</div>
-              <div class="card-body">
+            <div className="card mb-3">
+              <div className="card-header">Product Details</div>
+              <div className="card-body">
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                  <span>
-                    Price (Item {cartList.length > 0 && cartList.length}) :{" "}
-                  </span>
+                  <span>Price (Item {totalItem}) : </span>
                   <span>₹{price}</span>
                 </div>
                 <div
@@ -109,7 +91,7 @@ export default function Cart() {
                 </div>
               </div>
               <div
-                class="card-footer"
+              className="card-footer"
                 style={{ display: "flex", justifyContent: "space-between" }}
               >
                 <div>Total Payable</div>

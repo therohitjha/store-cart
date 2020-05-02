@@ -1,9 +1,9 @@
 import React,{useContext} from 'react'
-import {SortingContext} from '../Home'
+import {CartContext} from '../Home'
 
 
 function Sorting(props) {
-    const [sorting,setSorting,applyFilter]=useContext(SortingContext)
+    const {sorting,setSorting,handleProductSorting}=useContext(CartContext)
   
     return (
         <div className="filterModalContainer">
@@ -54,7 +54,7 @@ function Sorting(props) {
           <label htmlFor="discount">Reset</label>
         </div>
         <div className='text-center'>
-            <button className='applyBtn' onClick={()=>applyFilter()}>Apply</button>
+            <button className='applyBtn' onClick={()=>handleProductSorting()}>Apply</button>
         </div>
         
       </div>
@@ -62,7 +62,7 @@ function Sorting(props) {
            {props.handleClose &&  <div className="filterCancel" onClick={props.handleClose}>
               Cancel
             </div>}
-            {props.handleClose && <div className="filterApply" onClick={()=>{applyFilter();props.handleClose()}}>
+            {props.handleClose && <div className="filterApply" onClick={()=>{handleProductSorting();props.handleClose()}}>
               Apply
             </div>}
           </div>
