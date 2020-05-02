@@ -127,7 +127,7 @@ export default function Home() {
   };
 
   const decreaseQty = (productData) => {
-    if (productData) {
+    if (productData.count>0) {
       let tempCart = [...cartList];
       let tempItem = tempCart.find((item) => item.id === productData.id);
       tempItem.count--;
