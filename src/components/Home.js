@@ -16,6 +16,11 @@ export default function Home() {
   const [sorting, setSorting] = useState("");
   const [search, setSearch] = useState("");
   const [totalItem, setTotalItem] = useState(0);
+  const [filter, setFilter] = useState({
+    min: 7999,
+    max: 84999,
+    priceFilter: 7999,
+  });
 
   useEffect(() => {
     const filterData = new Promise((res, rej) => {
@@ -32,7 +37,11 @@ export default function Home() {
           );
       })
       .catch(console.log());
-  }, [search]);
+
+    setProductList((prevData) =>
+      prevData.filter((item) => item.price.actual >= filter.priceFilter)
+    );
+  }, [search, filter.priceFilter]);
 
   useEffect(() => {
     let total = 0;
@@ -54,6 +63,13 @@ export default function Home() {
   const handleOnChange = (e) => {
     const { value } = e.target;
     setSearch(value);
+  };
+
+  const handleFilter = (e) => {
+    const { name, value } = e.target;
+    setFilter((prevData) => {
+      return { ...prevData, [name]: value };
+    });
   };
 
   const handleProductSorting = () => {
@@ -141,6 +157,8 @@ export default function Home() {
             handleProductSorting,
             handleOnChange,
             search,
+            handleFilter,
+            filter,
           }}
         >
           <Route

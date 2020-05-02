@@ -1,13 +1,15 @@
 import React, { useContext } from "react";
 import { CartContext } from "./Home";
 import Filter from "./filterComponents/Filter";
-import { Range } from "rc-slider";
-import "rc-slider/assets/index.css";
 import Sorting from "./filterComponents/Sorting";
 
 function ProductList() {
-  const {addToCart, productList} = useContext(CartContext);
-
+  const {
+    addToCart,
+    productList,
+    filter: { min, max, priceFilter },
+    handleFilter,
+  } = useContext(CartContext);
 
   return (
     <div>
@@ -18,7 +20,17 @@ function ProductList() {
         <div className="filterColumn hide4Mobile">
           <div className="sideMenuFilterBody">
             <span>Filter</span>
-            <Range defaultValue={[100, 1000]} min={100} max={1000} />
+            <input
+              type="range"
+              name='priceFilter'
+              max={max}
+              min={min}
+              value={priceFilter}
+              style={{width:'100%'}}
+              step='1'
+              onChange={(e) => handleFilter(e)}
+            />
+            {priceFilter}
             <button className="applyBtn">Apply</button>
           </div>
           <div className="mt-4">

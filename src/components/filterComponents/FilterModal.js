@@ -1,17 +1,27 @@
-import React from "react";
+import React, { useContext } from "react";
 import "../../scss/style.scss";
 import { Modal } from "react-bootstrap";
-import { Range } from "rc-slider";
-import 'rc-slider/assets/index.css';
+import { CartContext } from "../Home";
 
 function FilterModal({ show, handleClose }) {
+  const {
+    filter: { min, max, priceFilter },
+    handleFilter,
+  } = useContext(CartContext);
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>Filter</Modal.Header>
       <Modal.Body>
         <div className="filterModalContainer">
           <div className="filterBody">
-            <Range defaultValue={[100, 1000]} min={100} max={1000}/>
+            <input
+              type="range"
+              value={priceFilter}
+              name='priceFilter'
+              min={min}
+              max={max}
+              onChange={(e) => handleFilter(e)}
+            />
           </div>
 
           <div className="filterCancelApply">
